@@ -1,0 +1,171 @@
+{
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Deploys Azure Lighthouse delegations to multiple subscriptions in the same customer tenant from one subscription-scope deployment.",
+    "parameterInstructions": {
+      "managedByTenantId": "Replace with the service provider Microsoft Entra tenant ID.",
+      "delegations": "Add one object per target subscription. Each authorizations array may contain multiple principals and built-in role IDs.",
+      "commonRoleDefinitionIds": {
+        "Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+        "Contributor": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+        "Managed Services Registration Assignment Delete Role": "91c1777a-f3dc-4fae-b103-61d183457e46"
+      }
+    }
+  },
+  "parameters": {
+    "deploymentLocation": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region used only to store the nested subscription deployment records."
+      }
+    },
+    "managedByTenantId": {
+      "type": "string",
+      "defaultValue": "REPLACE-WITH-SERVICE-PROVIDER-TENANT-ID",
+      "metadata": {
+        "description": "Microsoft Entra tenant ID of the service provider (managing tenant)."
+      }
+    },
+    "delegations": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "subscriptionId": "REPLACE-WITH-FIRST-CUSTOMER-SUBSCRIPTION-ID",
+          "offerName": "REPLACE-WITH-YOUR-COMPANY-NAME Managed Services - Contributor",
+          "offerDescription": "Delegated subscription management through Azure Lighthouse.",
+          "authorizations": [
+            {
+              "principalId": "REPLACE-WITH-OPERATIONS-SECURITY-GROUP-OBJECT-ID",
+              "principalIdDisplayName": "REPLACE-WITH-YOUR-COMPANY-NAME Operations",
+              "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+            },
+            {
+              "principalId": "REPLACE-WITH-OPERATIONS-SECURITY-GROUP-OBJECT-ID",
+              "principalIdDisplayName": "REPLACE-WITH-YOUR-COMPANY-NAME Operations - Delegation Removal",
+              "roleDefinitionId": "91c1777a-f3dc-4fae-b103-61d183457e46"
+            }
+          ]
+        },
+        {
+          "subscriptionId": "REPLACE-WITH-SECOND-CUSTOMER-SUBSCRIPTION-ID",
+          "offerName": "REPLACE-WITH-YOUR-COMPANY-NAME Managed Services - Reader",
+          "offerDescription": "Read-only delegated subscription access through Azure Lighthouse.",
+          "authorizations": [
+            {
+              "principalId": "REPLACE-WITH-READERS-SECURITY-GROUP-OBJECT-ID",
+              "principalIdDisplayName": "REPLACE-WITH-YOUR-COMPANY-NAME Readers",
+              "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+            },
+            {
+              "principalId": "REPLACE-WITH-OPERATIONS-SECURITY-GROUP-OBJECT-ID",
+              "principalIdDisplayName": "REPLACE-WITH-YOUR-COMPANY-NAME Operations - Delegation Removal",
+              "roleDefinitionId": "91c1777a-f3dc-4fae-b103-61d183457e46"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "description": "Delegations to deploy. Each item targets one subscription and contains its own Azure Lighthouse authorizations."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('lighthouse-{0}-{1}', copyIndex('delegationLoop'), uniqueString(parameters('delegations')[copyIndex('delegationLoop')].subscriptionId, parameters('delegations')[copyIndex('delegationLoop')].offerName))]",
+      "subscriptionId": "[parameters('delegations')[copyIndex('delegationLoop')].subscriptionId]",
+      "location": "[parameters('deploymentLocation')]",
+      "copy": {
+        "name": "delegationLoop",
+        "count": "[length(parameters('delegations'))]"
+      },
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "mspOfferName": {
+            "value": "[parameters('delegations')[copyIndex('delegationLoop')].offerName]"
+          },
+          "mspOfferDescription": {
+            "value": "[parameters('delegations')[copyIndex('delegationLoop')].offerDescription]"
+          },
+          "managedByTenantId": {
+            "value": "[parameters('managedByTenantId')]"
+          },
+          "authorizations": {
+            "value": "[parameters('delegations')[copyIndex('delegationLoop')].authorizations]"
+          }
+        },
+        "template": {
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "mspOfferName": {
+              "type": "string"
+            },
+            "mspOfferDescription": {
+              "type": "string"
+            },
+            "managedByTenantId": {
+              "type": "string"
+            },
+            "authorizations": {
+              "type": "array"
+            }
+          },
+          "variables": {
+            "registrationDefinitionName": "[guid(subscription().subscriptionId, parameters('managedByTenantId'), parameters('mspOfferName'), 'definition')]",
+            "registrationAssignmentName": "[guid(subscription().subscriptionId, parameters('managedByTenantId'), parameters('mspOfferName'), 'assignment')]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ManagedServices/registrationDefinitions",
+              "apiVersion": "2022-10-01",
+              "name": "[variables('registrationDefinitionName')]",
+              "properties": {
+                "registrationDefinitionName": "[parameters('mspOfferName')]",
+                "description": "[parameters('mspOfferDescription')]",
+                "managedByTenantId": "[parameters('managedByTenantId')]",
+                "authorizations": "[parameters('authorizations')]"
+              }
+            },
+            {
+              "type": "Microsoft.ManagedServices/registrationAssignments",
+              "apiVersion": "2022-10-01",
+              "name": "[variables('registrationAssignmentName')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedServices/registrationDefinitions', variables('registrationDefinitionName'))]"
+              ],
+              "properties": {
+                "registrationDefinitionId": "[resourceId('Microsoft.ManagedServices/registrationDefinitions', variables('registrationDefinitionName'))]"
+              }
+            }
+          ],
+          "outputs": {
+            "offerName": {
+              "type": "string",
+              "value": "[parameters('mspOfferName')]"
+            },
+            "registrationDefinitionId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedServices/registrationDefinitions', variables('registrationDefinitionName'))]"
+            },
+            "registrationAssignmentId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedServices/registrationAssignments', variables('registrationAssignmentName'))]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "delegationCount": {
+      "type": "int",
+      "value": "[length(parameters('delegations'))]"
+    }
+  }
+}
