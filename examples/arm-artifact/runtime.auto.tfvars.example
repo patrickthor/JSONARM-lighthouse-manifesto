@@ -1,0 +1,9 @@
+# Copy to runtime.auto.tfvars for local use. The copied file is ignored by git.
+# CI should supply these through TF_VAR_* or protected repository variables.
+
+managing_tenant_id                    = "22222222-2222-2222-2222-222222222222"
+artifact_version                      = "2026.01.0"
+artifact_storage_subscription_id      = "55555555-5555-5555-5555-555555555555"
+artifact_storage_resource_group_name  = "rg-example-lighthouse-artifacts"
+artifact_storage_account_name         = "stexampleartifacts"
+artifact_storage_container_name       = "lighthouse-artifacts"

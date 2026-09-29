@@ -9,6 +9,10 @@ crash.*.log
 # Local variable and override files
 *.tfvars
 *.tfvars.json
+
+# Reviewed, non-secret governance records used by the reference consumers
+!examples/arm-artifact/terraform.tfvars
+!examples/native-terraform/terraform.tfvars
 override.tf
 override.tf.json
 *_override.tf

@@ -1,6 +1,0 @@
-artifact_storage_subscription_id    = "55555555-5555-5555-5555-555555555555"
-artifact_storage_resource_group_name = "rg-example-lighthouse-artifacts"
-artifact_storage_account_name        = "stexampleartifacts"
-artifact_storage_container_name      = "lighthouse-artifacts"
-artifact_version                     = "2026.01.0"
-customer_key                         = "example-customer"

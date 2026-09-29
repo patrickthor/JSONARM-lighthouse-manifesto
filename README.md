@@ -83,6 +83,32 @@ module "lighthouse" {
 
 The keys under `principals` are stable Terraform identity keys. Keep them static and do not derive them from resource attributes that are unknown during planning. Azure object UUIDs remain values.
 
+## Consumer governance pattern
+
+The core module intentionally accepts one customer delegation. The reference consumers move customer-specific policy out of `main.tf` and into narrowly unignored, committed `terraform.tfvars` files so access changes arrive as reviewed pull requests:
+
+- [`examples/arm-artifact/terraform.tfvars`](examples/arm-artifact/terraform.tfvars) is a map of customers. The generic root uses `for_each` to render and publish one ARM artifact per stable customer key.
+- [`examples/native-terraform/terraform.tfvars`](examples/native-terraform/terraform.tfvars) contains exactly one customer subscription and delegation. Native deployments should use one state/provider execution per customer.
+
+The governance files contain no credentials. They hold subscription IDs, group and approver object IDs, offer metadata, role choices, and JIT policy. Shared/runtime values are intentionally separate:
+
+| Value | Recommended source |
+| --- | --- |
+| Managing tenant ID | `TF_VAR_managing_tenant_id` or protected repository variable |
+| Artifact version | Release tag or manually approved workflow input |
+| Azure authentication | OIDC and standard `ARM_*` environment variables |
+| Native provider subscription | `TF_VAR_provider_subscription_id`; validated against committed customer scope |
+| Artifact storage coordinates | Protected runtime variables |
+| Delegation policy | Committed governance tfvars |
+
+The consumer roots declare the nested governance variables as `any` to avoid copying this module's typed schema and validations. The module remains the authoritative contract. Stable customer and principal map keys are configuration-derived so `for_each` identities are known during planning.
+
+Do not expose `deployment_mode` as a casual workflow toggle. The ARM and native reference roots fix their mode in code because changing ownership mode can destroy or conflict with an existing delegation.
+
+### Committed tfvars allowlist
+
+The repository ignores tfvars by default and unignores only the two known, non-secret governance files. Runtime copies such as `runtime.auto.tfvars` remain ignored. Apply the same narrow allowlist in a consuming repository rather than globally committing every tfvars file.
+
 ### Inputs
 
 | Name | Type | Required | Description |

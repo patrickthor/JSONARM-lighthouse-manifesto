@@ -16,11 +16,16 @@ variable "artifact_storage_resource_group_name" {
 variable "artifact_storage_subscription_id" {
   type        = string
   description = "Subscription containing the existing artifact storage account."
+
+  validation {
+    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", var.artifact_storage_subscription_id))
+    error_message = "artifact_storage_subscription_id must be a UUID-shaped string."
+  }
 }
 
 variable "artifact_version" {
   type        = string
-  description = "Immutable, storage-path-safe artifact version."
+  description = "Immutable, storage-path-safe artifact version supplied by the release workflow."
 
   validation {
     condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9._-]*$", var.artifact_version))
@@ -28,12 +33,30 @@ variable "artifact_version" {
   }
 }
 
-variable "customer_key" {
-  type        = string
-  description = "Non-sensitive, storage-safe customer identifier."
+variable "customers" {
+  type        = any
+  description = "Committed governance map keyed by stable, storage-safe customer key. The Lighthouse module owns the nested delegation schema and validation."
 
   validation {
-    condition     = can(regex("^[a-z0-9][a-z0-9-]*$", var.customer_key))
-    error_message = "customer_key must contain only lowercase letters, numbers, and hyphens."
+    condition     = length(var.customers) > 0
+    error_message = "customers must contain at least one customer delegation."
+  }
+
+  validation {
+    condition = alltrue([
+      for customer_key in keys(var.customers) :
+      can(regex("^[a-z0-9][a-z0-9-]*$", customer_key))
+    ])
+    error_message = "Every customer key must contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
+variable "managing_tenant_id" {
+  type        = string
+  description = "Shared service-provider tenant ID supplied at runtime rather than repeated in the governance record."
+
+  validation {
+    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", var.managing_tenant_id))
+    error_message = "managing_tenant_id must be a UUID-shaped string."
   }
 }
