@@ -1,0 +1,200 @@
+digraph "Azure Lighthouse - ikke-CSP tjenesteleverandor" {
+	graph [bb="0,0,1813.4,451.75",
+		fontcolor="#2D3436",
+		fontname="Sans-Serif",
+		fontsize=15,
+		label="Azure Lighthouse - ikke-CSP tjenesteleverandor",
+		lheight=0.22,
+		lp="906.7,11.875",
+		lwidth=4.43,
+		nodesep=0.60,
+		pad=2.0,
+		rankdir=LR,
+		ranksep=0.75,
+		splines=ortho
+	];
+	node [fixedsize=true,
+		fontcolor="#2D3436",
+		fontname="Sans-Serif",
+		fontsize=13,
+		height=1.4,
+		imagescale=true,
+		label="\N",
+		labelloc=b,
+		shape=box,
+		style=rounded,
+		width=1.4
+	];
+	edge [color="#7B8894"];
+	subgraph "cluster_Tjenesteleverandørens tenant (ikke CSP)" {
+		graph [bb="8,31.75,1314.3,443.75",
+			bgcolor="#E5F5FD",
+			fontname="Sans-Serif",
+			fontsize=12,
+			label="Tjenesteleverandørens tenant (ikke CSP)",
+			labeljust=l,
+			lheight=0.18,
+			lp="126.25,433.38",
+			lwidth=3.06,
+			pencolor="#AEB6BE",
+			rankdir=LR,
+			shape=box,
+			style=rounded
+		];
+		"051b0f6c7e5b4aed86c550d8f27a3f14"	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/identity/\
+conditional-access.png",
+			label="Conditional Access
+phishing-resistent MFA",
+			pos="66.4,122.75",
+			shape=none];
+		"12a1adbb26104f078d402ac8a134e28d"	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/aws/general/user.png",
+			label="Intern konsulent
+(medlemskonto)",
+			pos="254.2,122.75",
+			shape=none];
+		"051b0f6c7e5b4aed86c550d8f27a3f14" -> "12a1adbb26104f078d402ac8a134e28d"	[dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label=sikrer,
+			lp="160.3,129.5",
+			pos="e,204.06,122.75 116.73,122.75 116.73,122.75 192.55,122.75 192.55,122.75",
+			style=dashed];
+		"39aaf703ab794919bf9ef114e9610c7f"	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/identity/\
+identity-governance.png",
+			label="Access package
+30-90 dager",
+			pos="485.5,122.75",
+			shape=none];
+		"12a1adbb26104f078d402ac8a134e28d" -> "39aaf703ab794919bf9ef114e9610c7f"	[dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label="1. søker",
+			lp="369.85,129.5",
+			pos="e,435.41,122.75 304.39,122.75 304.39,122.75 423.9,122.75 423.9,122.75"];
+		"28db3115410543e7af497ff2cb7a7aac"	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/identity/\
+groups.png",
+			label="LH-CustomerA-
+PlatformOperators",
+			pos="730.3,122.75",
+			shape=none];
+		"39aaf703ab794919bf9ef114e9610c7f" -> "28db3115410543e7af497ff2cb7a7aac"	[dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label="2. medlemskap",
+			lp="607.9,129.5",
+			pos="e,680.24,122.75 535.63,122.75 535.63,122.75 668.72,122.75 668.72,122.75"];
+		"64326c5db2ae4c8c882bdada05dccae3"	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/identity/\
+access-review.png",
+			label="Access review
+og automatisk utløp",
+			pos="254.2,331.75",
+			shape=none];
+		"64326c5db2ae4c8c882bdada05dccae3" -> "39aaf703ab794919bf9ef114e9610c7f"	[dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label="styrer levetid",
+			lp="369.85,264.5",
+			pos="e,485.4,205.35 304.37,331.75 372.36,331.75 485.4,331.75 485.4,331.75 485.4,331.75 485.4,216.87 485.4,216.87",
+			style=dashed];
+		"4b2120676c9044369437b1e49756bb76"	[height=2.7,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/identity/\
+entra-privleged-identity-management.png",
+			label="PIM / eligible rolle
+MFA + godkjenning
+1-4 timer",
+			pos="963.85,196.75",
+			shape=none];
+		"28db3115410543e7af497ff2cb7a7aac" -> "4b2120676c9044369437b1e49756bb76"	[dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label="3. ber om JIT",
+			lp="847.08,166.5",
+			pos="e,913.55,152.55 780.69,152.55 780.69,152.55 902.04,152.55 902.04,152.55"];
+		e86a0def10c14004a0722bd72fb729d5	[height=2.7,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/general/\
+resource-linked.png",
+			label="Azure Lighthouse
+Reader: aktiv
+Contributor: aktivert JIT",
+			pos="1255.9,196.75",
+			shape=none];
+		"4b2120676c9044369437b1e49756bb76" -> e86a0def10c14004a0722bd72fb729d5	[color=darkorange,
+			dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label="4. aktiverer Contributor",
+			lp="1109.9,203.5",
+			pos="e,1205.9,196.75 1014.1,196.75 1014.1,196.75 1194.3,196.75 1194.3,196.75"];
+		"42332b65fbad46e2a8e850947c99a13b"	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/aws/general/user.png",
+			label="Oppdragseier /
+teamleder",
+			pos="730.3,331.75",
+			shape=none];
+		"42332b65fbad46e2a8e850947c99a13b" -> "4b2120676c9044369437b1e49756bb76"	[color=darkorange,
+			dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label=godkjenner,
+			lp="847.08,301.5",
+			pos="e,913.55,271.45 780.69,271.45 780.69,271.45 902.04,271.45 902.04,271.45",
+			style=dashed];
+	}
+	subgraph "cluster_Kundens tenant" {
+		graph [bb="1496.3,105.75,1805.4,308.75",
+			bgcolor="#E5F5FD",
+			fontname="Sans-Serif",
+			fontsize=12,
+			label="Kundens tenant",
+			labeljust=l,
+			lheight=0.18,
+			lp="1546.3,298.38",
+			lwidth=1.17,
+			pencolor="#AEB6BE",
+			rankdir=LR,
+			shape=box,
+			style=rounded
+		];
+		"75983804dfa0479caeea014b5c7135f5"	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/general/\
+subscriptions.png",
+			label="5. Delegert
+Azure-abonnement",
+			pos="1554.7,196.75",
+			shape=none];
+		f69f46b288574c148d107f2f547de4c2	[height=2.3,
+			image="/Users/patrick.thor/.local/share/uv/tools/infrastructure-diagram-mcp-server/lib/python3.12/site-packages/resources/azure/analytics/\
+log-analytics-workspaces.png",
+			label="6. Activity Log
+sporbarhet",
+			pos="1747,196.75",
+			shape=none];
+		"75983804dfa0479caeea014b5c7135f5" -> f69f46b288574c148d107f2f547de4c2	[dir=forward,
+			fontcolor="#2D3436",
+			fontname="Sans-Serif",
+			fontsize=13,
+			label=logger,
+			lp="1650.9,203.5",
+			pos="e,1696.7,196.75 1605,196.75 1605,196.75 1685.2,196.75 1685.2,196.75"];
+	}
+	e86a0def10c14004a0722bd72fb729d5 -> "75983804dfa0479caeea014b5c7135f5"	[color=blue,
+		dir=forward,
+		fontcolor="#2D3436",
+		fontname="Sans-Serif",
+		fontsize=13,
+		label="Reader / JIT Contributor",
+		lp="1405.3,203.5",
+		pos="e,1504.4,196.75 1306.2,196.75 1306.2,196.75 1492.9,196.75 1492.9,196.75"];
+}
