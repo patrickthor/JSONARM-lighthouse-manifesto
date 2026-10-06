@@ -176,15 +176,24 @@ Authorization changes in the manual path require regeneration, customer review, 
 
 ## Artifact publication boundary
 
-The core module never creates or selects remote storage. The consuming repository or pipeline owns artifact publication, access grants, retention, blob versioning, immutability, and customer delivery.
+The core Lighthouse module is storage-independent: it never creates, selects, queries, or publishes to remote storage. Its artifact interface remains limited to `arm_template_json`, `arm_template_sha256`, and `suggested_artifact_name`, alongside the existing native and diagnostic outputs. These artifact values derive only from module inputs and locals.
 
-The ARM example uses an aliased AzureRM provider to upload `source_content` to an existing private container with content type `application/json`:
+Artifact publication must use an environment-specific repository dedicated to artifacts, with separate destinations for environments such as dev, test, and prod. **Never reuse the Terraform backend/state storage account or any state container for artifact publication.** Azure Blob Storage is only the reference example; an equivalent private artifact repository is acceptable.
+
+The ARM example expects the dedicated storage account and private container to already exist. It uses these explicit runtime inputs to resolve them and publish the generated content:
+
+- `artifact_storage_subscription_id`
+- `artifact_storage_resource_group_name`
+- `artifact_storage_account_name`
+- `artifact_storage_container_name`
+
+The example preserves the immutable versioned Blob path and publishes with content type `application/json`:
 
 ```text
 lighthouse-artifacts/<customer-key>/<artifact-version>/lighthouse.json
 ```
 
-Use a dedicated artifact container, never the Terraform-state container. Use path-safe immutable version identifiers and do not generate SAS tokens in this module. Artifact storage can be in a separate subscription from native customer deployment.
+Provisioning the artifact repository or storage, Azure RBAC and data-plane access, network restrictions such as private endpoints and firewall rules, retention, immutability and versioning, and secure customer delivery all belong to the consuming repository or platform. Do not add those concerns to the core Lighthouse module. The example generates no SAS tokens, credentials, or storage keys.
 
 The minimal example manages one artifact version at one resource address. A production publisher that retains every version should model versions as separate retained resource/state entries or enforce retention and immutability in the storage platform.
 

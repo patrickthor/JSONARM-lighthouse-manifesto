@@ -1,3 +1,6 @@
+# This reference publication layer resolves an existing environment-specific
+# storage account dedicated to ARM artifacts. It must never point at the
+# Terraform backend/state storage account.
 data "azurerm_storage_account" "artifacts" {
   provider = azurerm.artifacts
 

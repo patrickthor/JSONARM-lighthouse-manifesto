@@ -1,21 +1,21 @@
 variable "artifact_storage_account_name" {
   type        = string
-  description = "Name of the existing artifact storage account."
+  description = "Name of the existing environment-specific storage account dedicated to artifacts, never Terraform backend/state storage."
 }
 
 variable "artifact_storage_container_name" {
   type        = string
-  description = "Name of the existing private artifact container. Do not use the Terraform-state container."
+  description = "Name of the existing private artifact container in the dedicated artifact storage account."
 }
 
 variable "artifact_storage_resource_group_name" {
   type        = string
-  description = "Resource group containing the existing artifact storage account."
+  description = "Resource group containing the existing dedicated artifact storage account."
 }
 
 variable "artifact_storage_subscription_id" {
   type        = string
-  description = "Subscription containing the existing artifact storage account."
+  description = "Subscription containing the existing dedicated artifact storage account."
 
   validation {
     condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", var.artifact_storage_subscription_id))

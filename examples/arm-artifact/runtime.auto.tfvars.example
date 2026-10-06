@@ -1,5 +1,8 @@
 # Copy to runtime.auto.tfvars for local use. The copied file is ignored by git.
 # CI should supply these through TF_VAR_* or protected repository variables.
+# These coordinates must identify an existing environment-specific storage
+# account dedicated to artifacts and its existing private container. Never use
+# the Terraform backend/state storage account or container.
 
 managing_tenant_id                    = "22222222-2222-2222-2222-222222222222"
 artifact_version                      = "2026.01.0"
